@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>记录 - 我的笔记</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="nav-logo">📝 我的笔记</a>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">首页</a>
+            <a href="journal.html" class="nav-link active">记录</a>
+        </div>
+        <button class="theme-toggle" id="themeToggle" title="切换主题">🌙</button>
+        <button class="menu-toggle" id="menuToggle">☰</button>
+    </div>
+</nav>
+
+<main>
+    <section class="section">
+        <div class="section-container">
+            <div class="journal-header">
+                <h2 class="section-title">📝 我的记录</h2>
+                <button class="btn btn-primary" id="newEntryBtn">+ 写新记录</button>
+            </div>
+
+            <div class="journal-toolbar">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="搜索记录..." class="search-input">
+                </div>
+                <div class="filter-group">
+                    <select id="categoryFilter" class="select-input">
+                        <option value="all">全部分类</option>
+                        <option value="学习笔记">📖 学习笔记</option>
+                        <option value="灵感碎片">💡 灵感碎片</option>
+                        <option value="日常记录">📅 日常记录</option>
+                        <option value="收藏整理">🔖 收藏整理</option>
+                    </select>
+                    <select id="sortFilter" class="select-input">
+                        <option value="newest">最新优先</option>
+                        <option value="oldest">最早优先</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="entries-grid" id="entriesGrid">
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">📝</div>
+                    <h3>还没有记录</h3>
+                    <p>点击上方按钮开始你的第一条记录吧！</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="editorModal">
+        <div class="modal-header">
+            <h3 id="modalTitle">写记录</h3>
+            <button class="modal-close" id="modalClose">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="entryForm">
+                <div class="form-group">
+                    <label for="entryTitle">标题</label>
+                    <input type="text" id="entryTitle" class="form-input" placeholder="给你的记录起个标题..." required>
+                </div>
+                <div class="form-group">
+                    <label for="entryCategory">分类</label>
+                    <select id="entryCategory" class="form-select">
+                        <option value="学习笔记">📖 学习笔记</option>
+                        <option value="灵感碎片">💡 灵感碎片</option>
+                        <option value="日常记录">📅 日常记录</option>
+                        <option value="收藏整理">🔖 收藏整理</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="entryContent">内容</label>
+                    <textarea id="entryContent" class="form-textarea" placeholder="开始写吧..." rows="10" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="entryTags">标签（用逗号分隔）</label>
+                    <input type="text" id="entryTags" class="form-input" placeholder="例如：JavaScript, 教程, 前端">
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="modalCancel">取消</button>
+            <button class="btn btn-primary" id="modalSave">保存</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer class="footer">
+    <div class="footer-container">
+        <p>&copy; 2026 我的笔记 · 用 ❤️ 记录生活</p>
+    </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script src="js/journal.js"></script>
+</body>
+</html>
