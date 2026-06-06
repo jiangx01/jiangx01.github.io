@@ -35,6 +35,11 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVlb2VtZ3BpdWN3cXdpdHZrd2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NDQ4ODksImV4cCI6MjA5NjMyMDg4OX0.OOATgsjtl1bAy2aLHIurXn3YdnI5OQdzFGQO6xVOORY';
     const PASSWORD_HASH = '4DE5262382BFBF22A8D9E62E6024CDC2D11EC27FEE203EB04A0A4C8143FC84E9';
 
+    const OSS_REGION = 'oss-cn-hangzhou';
+    const OSS_BUCKET = 'jiangx01';
+    const OSS_ACCESS_KEY_ID = 'LTAI5t6Kt65wQvdLVQTjtKbL';
+    const OSS_ACCESS_KEY_SECRET = 'THTmKFmhovWeTy4saBpp89BXCfaMbV';
+
     function isLoggedIn() {
         return localStorage.getItem('journal_logged_in') === 'true';
     }
@@ -108,15 +113,22 @@
     }
 
     async function uploadImage(file) {
+        var client = new OSS({
+            region: OSS_REGION,
+            accessKeyId: OSS_ACCESS_KEY_ID,
+            accessKeySecret: OSS_ACCESS_KEY_SECRET,
+            bucket: OSS_BUCKET,
+            secure: true
+        });
         var fileName = Date.now().toString(36) + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '');
-        const { error } = await supabaseClient.storage.from('images').upload(fileName, file);
-        if (error) {
-            console.error('Failed to upload image:', error);
+        try {
+            var result = await client.put(fileName, file);
+            return result.url;
+        } catch (error) {
+            console.error('Failed to upload image to OSS:', error);
             showToast('图片上传失败');
             return null;
         }
-        const { data: urlData } = supabaseClient.storage.from('images').getPublicUrl(fileName);
-        return urlData.publicUrl;
     }
 
     function generateId() {
