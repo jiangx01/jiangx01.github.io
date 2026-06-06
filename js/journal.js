@@ -24,6 +24,17 @@
     const loginForm = document.getElementById('loginForm');
     const loginBtn = document.getElementById('loginBtn');
 
+    const detailOverlay = document.getElementById('detailOverlay');
+    const detailClose = document.getElementById('detailClose');
+    const detailTitle = document.getElementById('detailTitle');
+    const detailCategory = document.getElementById('detailCategory');
+    const detailDate = document.getElementById('detailDate');
+    const detailTags = document.getElementById('detailTags');
+    const detailContent = document.getElementById('detailContent');
+
+    const uploadImageBtn = document.getElementById('uploadImageBtn');
+    const imageInput = document.getElementById('imageInput');
+
     let editingId = null;
 
     function updateLoginUI() {
@@ -87,6 +98,31 @@
         }
     }
 
+    function openDetail(entry) {
+        detailTitle.textContent = entry.title;
+        detailCategory.textContent = entry.category || '未分类';
+        var date = new Date(entry.createdAt);
+        detailDate.textContent = date.getFullYear() + '-' +
+            String(date.getMonth() + 1).padStart(2, '0') + '-' +
+            String(date.getDate()).padStart(2, '0') + ' ' +
+            String(date.getHours()).padStart(2, '0') + ':' +
+            String(date.getMinutes()).padStart(2, '0');
+        if (entry.tags && entry.tags.length) {
+            detailTags.innerHTML = entry.tags.map(function (t) {
+                return '<span class="entry-tag">#' + t + '</span>';
+            }).join('');
+            detailTags.style.display = '';
+        } else {
+            detailTags.style.display = 'none';
+        }
+        detailContent.innerHTML = entry.content;
+        detailOverlay.classList.add('show');
+    }
+
+    function closeDetail() {
+        detailOverlay.classList.remove('show');
+    }
+
     async function renderEntries() {
         const entries = await app.getEntries();
         const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
@@ -125,6 +161,7 @@
         filtered.forEach(function (entry) {
             const card = document.createElement('div');
             card.className = 'entry-card';
+            card.style.cursor = 'pointer';
 
             const date = new Date(entry.createdAt);
             const dateStr = date.getFullYear() + '-' +
@@ -156,6 +193,11 @@
                 '<div class="entry-content">' + escapeHtml(preview) + '</div>' +
                 (tagsHtml ? '<div class="entry-tags">' + tagsHtml + '</div>' : '') +
                 actionsHtml;
+
+            card.addEventListener('click', function (e) {
+                if (e.target.closest('.btn')) return;
+                openDetail(entry);
+            });
 
             entriesGrid.appendChild(card);
         });
@@ -265,6 +307,31 @@
         }
     }
 
+    async function handleImageUpload() {
+        var file = imageInput.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            app.showToast('请选择图片文件');
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            app.showToast('图片不能超过 5MB');
+            return;
+        }
+        var url = await app.uploadImage(file);
+        if (url) {
+            var imgTag = '\n<img src="' + url + '" alt="image" style="max-width:100%">\n';
+            var textarea = entryContent;
+            var start = textarea.selectionStart;
+            var end = textarea.selectionEnd;
+            textarea.value = textarea.value.substring(0, start) + imgTag + textarea.value.substring(end);
+            textarea.focus();
+            textarea.selectionStart = textarea.selectionEnd = start + imgTag.length;
+            app.showToast('图片已插入');
+        }
+        imageInput.value = '';
+    }
+
     if (newEntryBtn) {
         newEntryBtn.addEventListener('click', function () {
             requireAuth(async function () {
@@ -314,12 +381,28 @@
         if (e.target === loginOverlay) closeLoginModal();
     });
 
+    if (detailClose) detailClose.addEventListener('click', closeDetail);
+    detailOverlay.addEventListener('click', function (e) {
+        if (e.target === detailOverlay) closeDetail();
+    });
+
+    if (uploadImageBtn && imageInput) {
+        uploadImageBtn.addEventListener('click', function () {
+            imageInput.click();
+        });
+        imageInput.addEventListener('change', handleImageUpload);
+    }
+
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') closeLoginModal();
         if (e.key === 'Enter' && loginOverlay.classList.contains('show')) {
             e.preventDefault();
             handleLogin();
         }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeDetail();
     });
 
     var params = new URLSearchParams(window.location.search);

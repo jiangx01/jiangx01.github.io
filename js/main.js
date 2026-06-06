@@ -107,6 +107,18 @@
         return true;
     }
 
+    async function uploadImage(file) {
+        var fileName = Date.now().toString(36) + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '');
+        const { error } = await supabaseClient.storage.from('images').upload(fileName, file);
+        if (error) {
+            console.error('Failed to upload image:', error);
+            showToast('图片上传失败');
+            return null;
+        }
+        const { data: urlData } = supabaseClient.storage.from('images').getPublicUrl(fileName);
+        return urlData.publicUrl;
+    }
+
     function generateId() {
         return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
     }
@@ -156,6 +168,7 @@
         showToast: showToast,
         isLoggedIn: isLoggedIn,
         login: login,
-        logout: logout
+        logout: logout,
+        uploadImage: uploadImage
     };
 })();
