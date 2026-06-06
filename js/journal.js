@@ -18,8 +18,8 @@
 
     let editingId = null;
 
-    function renderEntries() {
-        const entries = app.getEntries();
+    async function renderEntries() {
+        const entries = await app.getEntries();
         const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
         const catFilter = categoryFilter ? categoryFilter.value : 'all';
         const sort = sortFilter ? sortFilter.value : 'newest';
@@ -104,13 +104,13 @@
         return div.innerHTML;
     }
 
-    function openEditor(id) {
+    async function openEditor(id) {
         editingId = id || null;
         modalTitle.textContent = id ? '编辑记录' : '写新记录';
         entryForm.reset();
 
         if (id) {
-            var entries = app.getEntries();
+            var entries = await app.getEntries();
             var entry = entries.find(function (e) { return e.id === id; });
             if (entry) {
                 entryTitle.value = entry.title;
@@ -130,7 +130,7 @@
         entryForm.reset();
     }
 
-    function saveEntry() {
+    async function saveEntry() {
         var title = entryTitle.value.trim();
         var category = entryCategory.value;
         var content = entryContent.value.trim();
@@ -149,20 +149,21 @@
 
         var tags = tagsStr ? tagsStr.split(',').map(function (t) { return t.trim(); }).filter(Boolean) : [];
 
-        var entries = app.getEntries();
-
         if (editingId) {
-            var idx = entries.findIndex(function (e) { return e.id === editingId; });
-            if (idx !== -1) {
-                entries[idx].title = title;
-                entries[idx].category = category;
-                entries[idx].content = content;
-                entries[idx].tags = tags;
-                entries[idx].updatedAt = Date.now();
+            var ok = await app.updateEntry(editingId, {
+                title: title,
+                category: category,
+                content: content,
+                tags: tags,
+                updatedAt: Date.now()
+            });
+            if (ok) {
+                app.showToast('已更新');
+                closeEditor();
+                await renderEntries();
             }
-            app.showToast('已更新');
         } else {
-            entries.unshift({
+            var entry = {
                 id: app.generateId(),
                 title: title,
                 category: category,
@@ -170,22 +171,23 @@
                 tags: tags,
                 createdAt: Date.now(),
                 updatedAt: Date.now()
-            });
-            app.showToast('已保存');
+            };
+            var ok = await app.addEntry(entry);
+            if (ok) {
+                app.showToast('已保存');
+                closeEditor();
+                await renderEntries();
+            }
         }
-
-        app.saveEntries(entries);
-        closeEditor();
-        renderEntries();
     }
 
-    function deleteEntry(id) {
+    async function deleteEntry(id) {
         if (!confirm('确定要删除这条记录吗？')) return;
-        var entries = app.getEntries();
-        entries = entries.filter(function (e) { return e.id !== id; });
-        app.saveEntries(entries);
-        renderEntries();
-        app.showToast('已删除');
+        var ok = await app.deleteEntry(id);
+        if (ok) {
+            await renderEntries();
+            app.showToast('已删除');
+        }
     }
 
     if (newEntryBtn) {
