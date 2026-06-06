@@ -15,6 +15,7 @@
         <div class="nav-links">
             <a href="index.html" class="nav-link">首页</a>
             <a href="journal.html" class="nav-link active">记录</a>
+            <button class="btn btn-sm" id="loginBtn" style="padding:4px 12px;font-size:13px">🔑 登录</button>
         </div>
         <button class="theme-toggle" id="themeToggle" title="切换主题">🌙</button>
         <button class="menu-toggle" id="menuToggle">☰</button>
@@ -58,6 +59,27 @@
         </div>
     </section>
 </main>
+
+<div class="modal-overlay" id="loginOverlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>🔑 验证身份</h3>
+            <button class="modal-close" id="loginClose">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginPassword">请输入密码以编辑记录</label>
+                    <input type="password" id="loginPassword" class="form-input" placeholder="输入密码..." required>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="loginCancel">取消</button>
+            <button class="btn btn-primary" id="loginConfirm">确认</button>
+        </div>
+    </div>
+</div>
 
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal" id="editorModal">

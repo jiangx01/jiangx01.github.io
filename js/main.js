@@ -33,6 +33,28 @@
 
     const SUPABASE_URL = 'https://ueoemgpiucwqwitvkwje.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVlb2VtZ3BpdWN3cXdpdHZrd2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NDQ4ODksImV4cCI6MjA5NjMyMDg4OX0.OOATgsjtl1bAy2aLHIurXn3YdnI5OQdzFGQO6xVOORY';
+    const PASSWORD_HASH = '4DE5262382BFBF22A8D9E62E6024CDC2D11EC27FEE203EB04A0A4C8143FC84E9';
+
+    function isLoggedIn() {
+        return localStorage.getItem('journal_logged_in') === 'true';
+    }
+
+    async function login(password) {
+        const msgBuffer = new TextEncoder().encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hash = hashArray.map(function (b) { return b.toString(16).padStart(2, '0'); }).join('').toUpperCase();
+        if (hash === PASSWORD_HASH) {
+            localStorage.setItem('journal_logged_in', 'true');
+            return true;
+        }
+        return false;
+    }
+
+    function logout() {
+        localStorage.removeItem('journal_logged_in');
+    }
+
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     async function getEntries() {
@@ -131,6 +153,9 @@
         updateEntry: updateEntry,
         deleteEntry: deleteEntry,
         generateId: generateId,
-        showToast: showToast
+        showToast: showToast,
+        isLoggedIn: isLoggedIn,
+        login: login,
+        logout: logout
     };
 })();
