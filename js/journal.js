@@ -322,6 +322,12 @@
         }
     });
 
+    var params = new URLSearchParams(window.location.search);
+    var catParam = params.get('category');
+    if (catParam && categoryFilter) {
+        categoryFilter.value = catParam;
+    }
+
     updateLoginUI();
     renderEntries();
 })();
