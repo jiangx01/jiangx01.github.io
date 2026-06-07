@@ -314,8 +314,8 @@
             app.showToast('请选择图片文件');
             return;
         }
-        if (file.size > 50 * 1024 * 1024) {
-            app.showToast('图片不能超过 50MB');
+        if (file.size > 20 * 1024 * 1024) {
+            app.showToast('图片不能超过 20MB');
             return;
         }
         var url = await app.uploadImage(file);
