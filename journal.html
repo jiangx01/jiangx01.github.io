@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>记录 - 我的笔记</title>
+    <title>博客 - Jiang 的博客</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 </head>
 <body>
 
 <nav class="navbar">
     <div class="nav-container">
-        <a href="index.html" class="nav-logo">📝 我的笔记</a>
+        <a href="index.html" class="nav-logo">📝 Jiang 的博客</a>
         <div class="nav-links">
             <a href="index.html" class="nav-link">首页</a>
-            <a href="journal.html" class="nav-link active">记录</a>
+            <a href="journal.html" class="nav-link active">博客</a>
             <button class="btn btn-sm" id="loginBtn" style="padding:4px 12px;font-size:13px">🔑 登录</button>
         </div>
         <button class="theme-toggle" id="themeToggle" title="切换主题">🌙</button>
@@ -26,13 +27,13 @@
     <section class="section">
         <div class="section-container">
             <div class="journal-header">
-                <h2 class="section-title">📝 我的记录</h2>
-                <button class="btn btn-primary" id="newEntryBtn">+ 写新记录</button>
+                <h2 class="section-title">📝 博客文章</h2>
+                <button class="btn btn-primary" id="newEntryBtn">✏️ 写文章</button>
             </div>
 
             <div class="journal-toolbar">
                 <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="搜索记录..." class="search-input">
+                    <input type="text" id="searchInput" placeholder="搜索文章..." class="search-input">
                 </div>
                 <div class="filter-group">
                     <select id="categoryFilter" class="select-input">
@@ -49,12 +50,16 @@
                 </div>
             </div>
 
-            <div class="entries-grid" id="entriesGrid">
+            <div class="blog-grid" id="entriesGrid">
                 <div class="empty-state" id="emptyState">
                     <div class="empty-icon">📝</div>
-                    <h3>还没有记录</h3>
-                    <p>点击上方按钮开始你的第一条记录吧！</p>
+                    <h3>还没有文章</h3>
+                    <p>点击上方按钮开始写第一篇文章吧！</p>
                 </div>
+            </div>
+
+            <div class="pagination" id="pagination">
+                <button class="btn btn-secondary" id="loadMoreBtn">加载更多</button>
             </div>
         </div>
     </section>
@@ -69,7 +74,7 @@
         <div class="modal-body">
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="loginPassword">请输入密码以编辑记录</label>
+                    <label for="loginPassword">请输入密码以管理文章</label>
                     <input type="password" id="loginPassword" class="form-input" placeholder="输入密码..." required>
                 </div>
             </form>
@@ -91,24 +96,28 @@
             <div class="detail-meta">
                 <span class="entry-category" id="detailCategory"></span>
                 <span class="entry-date" id="detailDate"></span>
+                <span class="reading-time" id="detailReadingTime"></span>
             </div>
             <div class="detail-tags" id="detailTags"></div>
-            <div class="detail-content" id="detailContent"></div>
+            <div class="detail-content markdown-body" id="detailContent"></div>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn btn-primary btn-sm" id="detailOpenBtn" target="_blank">打开全文</a>
         </div>
     </div>
 </div>
 
 <div class="modal-overlay" id="modalOverlay">
-    <div class="modal" id="editorModal">
+    <div class="modal modal-wide" id="editorModal">
         <div class="modal-header">
-            <h3 id="modalTitle">写记录</h3>
+            <h3 id="modalTitle">写文章</h3>
             <button class="modal-close" id="modalClose">&times;</button>
         </div>
         <div class="modal-body">
             <form id="entryForm">
                 <div class="form-group">
                     <label for="entryTitle">标题</label>
-                    <input type="text" id="entryTitle" class="form-input" placeholder="给你的记录起个标题..." required>
+                    <input type="text" id="entryTitle" class="form-input" placeholder="给文章起个标题..." required>
                 </div>
                 <div class="form-group">
                     <label for="entryCategory">分类</label>
@@ -120,16 +129,30 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="entryContent">内容</label>
-                    <textarea id="entryContent" class="form-textarea" placeholder="开始写吧..." rows="10" required></textarea>
+                    <div class="editor-tabs">
+                        <button type="button" class="editor-tab active" data-tab="write">✏️ 编辑</button>
+                        <button type="button" class="editor-tab" data-tab="preview">👁️ 预览</button>
+                    </div>
+                    <div class="editor-container">
+                        <textarea id="entryContent" class="form-textarea editor-textarea" placeholder="开始写吧...&#10;&#10;支持 Markdown 语法：&#10;# 标题&#10;**粗体** *斜体*&#10;- 列表&#10;`代码`&#10;![图片描述](图片URL)" rows="16"></textarea>
+                        <div class="editor-preview markdown-body" id="editorPreview" style="display:none"></div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="entryTags">标签（用逗号分隔）</label>
                     <input type="text" id="entryTags" class="form-input" placeholder="例如：JavaScript, 教程, 前端">
                 </div>
                 <div class="form-group">
-                    <button type="button" class="btn btn-secondary btn-sm" id="uploadImageBtn">🖼️ 插入图片</button>
-                    <input type="file" id="imageInput" accept="image/*" style="display:none">
+                    <label>封面图片</label>
+                    <div class="cover-input-group">
+                        <input type="text" id="entryCover" class="form-input" placeholder="输入图片 URL 或上传">
+                        <button type="button" class="btn btn-secondary btn-sm" id="uploadImageBtn">🖼️ 上传</button>
+                        <input type="file" id="imageInput" accept="image/*" style="display:none">
+                    </div>
+                    <div class="cover-preview" id="coverPreview" style="display:none">
+                        <img id="coverPreviewImg" src="" alt="封面预览">
+                        <button type="button" class="btn btn-danger btn-sm" id="coverRemoveBtn">移除</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -144,10 +167,12 @@
 
 <footer class="footer">
     <div class="footer-container">
-        <p>&copy; 2026 我的笔记 · 用 ❤️ 记录生活</p>
+        <p>&copy; 2026 Jiang 的博客 · 用 ❤️ 记录生活</p>
     </div>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="js/main.js"></script>
 <script src="js/journal.js"></script>

@@ -3,18 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的笔记</title>
+    <title>Jiang 的博客</title>
+    <meta name="description" content="个人博客，记录技术学习、生活思考和灵感碎片。">
+    <meta property="og:title" content="Jiang 的博客">
+    <meta property="og:description" content="个人博客，记录技术学习、生活思考和灵感碎片。">
+    <meta property="og:type" content="website">
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 </head>
 <body>
 
 <nav class="navbar">
     <div class="nav-container">
-        <a href="index.html" class="nav-logo">📝 我的笔记</a>
+        <a href="index.html" class="nav-logo">📝 Jiang 的博客</a>
         <div class="nav-links">
             <a href="index.html" class="nav-link active">首页</a>
-            <a href="journal.html" class="nav-link">记录</a>
+            <a href="journal.html" class="nav-link">博客</a>
         </div>
         <button class="theme-toggle" id="themeToggle" title="切换主题">🌙</button>
         <button class="menu-toggle" id="menuToggle">☰</button>
@@ -26,26 +31,38 @@
         <div class="hero-content">
             <div class="hero-avatar">👤</div>
             <h1 class="hero-title">你好，我是 <span class="highlight">Jiang</span></h1>
-            <p class="hero-subtitle">这里是我的个人笔记空间，记录学习、生活和思考。</p>
+            <p class="hero-subtitle">这里是我的个人博客，记录技术学习、生活思考和灵感碎片。</p>
             <div class="hero-actions">
-                <a href="journal.html" class="btn btn-primary">开始记录</a>
+                <a href="journal.html" class="btn btn-primary">浏览博客</a>
             </div>
         </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="latestPosts">
         <div class="section-container">
-            <h2 class="section-title">📋 关于这个站点</h2>
-            <div class="cards-grid">
+            <div class="section-header">
+                <h2 class="section-title">📰 最新文章</h2>
+                <a href="journal.html" class="btn btn-secondary btn-sm">查看全部 →</a>
+            </div>
+            <div class="blog-grid" id="latestGrid">
+                <div class="loading-spinner">加载中...</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-alt">
+        <div class="section-container">
+            <h2 class="section-title">📂 分类</h2>
+            <div class="cards-grid" id="categoryGrid">
                 <a href="journal.html?category=学习笔记" class="card" style="text-decoration:none;color:inherit">
                     <div class="card-icon">📖</div>
                     <h3 class="card-title">学习笔记</h3>
-                    <p class="card-text">记录技术学习过程中的知识点、踩坑记录和心得总结。</p>
+                    <p class="card-text">技术学习过程中的知识点、踩坑记录和心得总结。</p>
                 </a>
                 <a href="journal.html?category=灵感碎片" class="card" style="text-decoration:none;color:inherit">
                     <div class="card-icon">💡</div>
                     <h3 class="card-title">灵感碎片</h3>
-                    <p class="card-text">随时捕捉闪现的想法和灵感，不让好点子溜走。</p>
+                    <p class="card-text">随时闪现的想法和灵感，不让好点子溜走。</p>
                 </a>
                 <a href="journal.html?category=日常记录" class="card" style="text-decoration:none;color:inherit">
                     <div class="card-icon">📅</div>
@@ -55,19 +72,19 @@
                 <a href="journal.html?category=收藏整理" class="card" style="text-decoration:none;color:inherit">
                     <div class="card-icon">🔖</div>
                     <h3 class="card-title">收藏整理</h3>
-                    <p class="card-text">整理收藏的好文章、工具资源和学习资料。</p>
+                    <p class="card-text">整理的好文章、工具资源和学习资料。</p>
                 </a>
             </div>
         </div>
     </section>
 
-    <section class="section section-alt">
+    <section class="section">
         <div class="section-container">
             <h2 class="section-title">📊 站点统计</h2>
             <div class="stats-grid" id="statsGrid">
                 <div class="stat-card">
                     <div class="stat-number" id="statEntries">0</div>
-                    <div class="stat-label">总记录</div>
+                    <div class="stat-label">总文章</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="statCategories">0</div>
@@ -88,10 +105,12 @@
 
 <footer class="footer">
     <div class="footer-container">
-        <p>&copy; 2026 我的笔记 · 用 ❤️ 记录生活</p>
+        <p>&copy; 2026 Jiang 的博客 · 用 ❤️ 记录生活</p>
     </div>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="js/main.js"></script>
 </body>
